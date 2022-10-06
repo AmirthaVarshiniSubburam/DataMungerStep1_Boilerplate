@@ -35,7 +35,7 @@ public class DataMunger {
 
 	public String[] getSplitStrings(String queryString) {
 
-		return null;
+		return queryString.toLowerCase().split(" ");
 	}
 
 	/*
@@ -48,7 +48,7 @@ public class DataMunger {
 
 	public String getFileName(String queryString) {
 
-		return null;
+		return queryString.substring( queryString.indexOf("from") + 5, queryString.indexOf("csv") + 3  );
 	}
 
 	/*
@@ -63,7 +63,7 @@ public class DataMunger {
 	
 	public String getBaseQuery(String queryString) {
 
-		return null;
+		return queryString.substring( 0, queryString.indexOf("csv") + 3  );
 	}
 
 	/*
@@ -80,7 +80,7 @@ public class DataMunger {
 	
 	public String[] getFields(String queryString) {
 
-		return null;
+		return queryString.substring(queryString.indexOf("select ") + 7, queryString.indexOf(" from")).split(",");
 	}
 
 	/*
@@ -94,8 +94,28 @@ public class DataMunger {
 	 */
 	
 	public String getConditionsPartQuery(String queryString) {
+		
+		if (! queryString.contains("where") )
+		{
+			return null;
+		}
+		else if (queryString.contains("group by")) {
+			
+			return queryString.substring(queryString.indexOf("where") + 6, queryString.indexOf(" group by")).toLowerCase();
+			
+		} else if ( queryString.contains("order by") ){
 
-		return null;
+			return queryString.substring(queryString.indexOf("where") + 6, queryString.indexOf(" order by")).toLowerCase();
+			
+		}
+		else {
+			
+			return queryString.substring(queryString.indexOf("where") + 6, queryString.length()).toLowerCase();
+			
+		}
+		
+
+		
 	}
 
 	/*
@@ -115,7 +135,26 @@ public class DataMunger {
 
 	public String[] getConditions(String queryString) {
 
-		return null;
+		if(!queryString.contains("where"))
+		{
+			return null;
+		}
+		queryString = queryString.replace(" and ",",");
+		queryString = queryString.replace(" or ",",");
+
+		if(queryString.contains("group"))
+		{
+			return queryString.substring(queryString.indexOf("where")+6, queryString.indexOf("group")-1).toLowerCase().split(",");
+		}
+		else if(queryString.contains("order"))
+		{
+			return queryString.substring(queryString.indexOf("where")+6, queryString.indexOf("order")-1).toLowerCase().split(",");
+		}
+		else
+		{
+			return queryString.substring(queryString.indexOf("where")+6, queryString.length()).toLowerCase().split(",");
+		}
+		
 	}
 
 	/*
@@ -131,7 +170,26 @@ public class DataMunger {
 
 	public String[] getLogicalOperators(String queryString) {
 
-		return null;
+		queryString = queryString.toLowerCase();
+		String[] array = queryString.split(" ");
+		
+		String logical = "";
+		
+		if(queryString.contains("where"))
+		{
+		for (int i = 0; i < array.length; i++) {
+			
+			if(array[i].matches("and|or"))
+			{
+				logical = logical + array[i] + " ";
+			}	
+		}
+		
+		return logical.split(" ");
+		}
+		else {
+			return null;
+		}
 	}
 
 	/*
@@ -144,7 +202,14 @@ public class DataMunger {
 
 	public String[] getOrderByFields(String queryString) {
 
+		if(queryString.contains("order by"))
+		{
+			return queryString.substring(queryString.indexOf("order by ") + 9).split(" ");
+		}
+		
+		else {
 		return null;
+		}
 	}
 
 	/*
@@ -158,7 +223,14 @@ public class DataMunger {
 
 	public String[] getGroupByFields(String queryString) {
 
+		if(queryString.contains("group by"))
+		{
+			return queryString.substring(queryString.indexOf("group by ") + 9).split(" ");
+		}
+		
+		else {
 		return null;
+		}
 	}
 
 	/*
@@ -173,7 +245,22 @@ public class DataMunger {
 
 	public String[] getAggregateFunctions(String queryString) {
 
-		return null;
+		if (queryString.contains("*"))
+		{
+			return null;
+		}
+		
+		else if ( queryString.contains("sum")  )
+		{
+			
+			return queryString.substring(queryString.indexOf("select") + 7, queryString.indexOf(" from")).split(",");
+		}
+		
+		else
+		{
+			return queryString.substring(queryString.indexOf("select") + 7, queryString.indexOf(",")).split(" ");
+		}
+		
+	}
 	}
 
-}
